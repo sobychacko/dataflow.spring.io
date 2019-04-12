@@ -1,43 +1,54 @@
 import execa from 'execa'
+import fs from 'fs'
 import path from 'path'
 
-import external from '../content/external-files.json'
 import transformer from './../plugins/spring-remark-variables/transformer'
-import variables from '../content/variables.json'
 import { execaOptions, info, main } from './utils'
 
-const DATA_DIR = path.join(__dirname, '../content/files/ext')
+const DATA_DIR = path.join(__dirname, '../data')
+const EXTERNAL_FILE = 'external-files.json'
+const VARIABLES_FILE = 'variables.json'
 
-const cleanDataDir = async () => {
-  // log('Cleaning', DATA_DIR)
-  const { failed } = await execa('rm', ['-rf', DATA_DIR], execaOptions)
-  if (failed) throw new Error(`Couldn't clean ${DATA_DIR}`)
+const cleanExternalFilesDir = dir => {
+  // log('Cleaning', EXTERNAL_FILES_DIR)
+  const { failed } = execa.sync('rm', ['-rf', dir], execaOptions)
+  if (failed) throw new Error(`Couldn't clean ${dir}`)
 }
 
-const createDir = async dir => {
+const createDir = dir => {
   // log('Creating', dir)
-  const { failed } = await execa('mkdir', ['-p', dir], execaOptions)
+  const { failed } = execa.sync('mkdir', ['-p', dir], execaOptions)
   if (failed) throw new Error(`Couldn't create ${dir}`)
 }
 
-const downloadFile = async (url, dest) => {
+const downloadFile = (url, dest) => {
   // log('Downloading', url, 'to', dest)
-  const { failed } = await execa('curl', ['-Ls', url, '-o', dest], execaOptions)
+  const { failed } = execa.sync('curl', ['-fLs', url, '-o', dest], execaOptions)
   if (failed) throw new Error(`Couldn't download ${url} to ${dest}`)
 }
 
-const externalFiles = async () => {
-  await cleanDataDir()
-  await createDir(DATA_DIR)
-
-  for (let { file, url } of external) {
-    url = transformer(url, variables)
+const processFile = (dir, config, variables = {}) => {
+  cleanExternalFilesDir(dir)
+  createDir(dir)
+  for (let { file, url } of config) {
     info('Loading', file)
-    const filePath = path.join(DATA_DIR, file)
+    const filePath = path.join(dir, file)
     const { dir: dirPath } = path.parse(filePath)
-    await createDir(dirPath)
-    await downloadFile(url, filePath)
+    createDir(dirPath)
+    downloadFile(transformer(url, variables), filePath)
   }
+}
+
+const externalFiles = async () => {
+  fs.readdirSync(DATA_DIR).forEach(dir => {
+    info('Version', dir)
+    const externalFilePath = path.join(DATA_DIR, dir, EXTERNAL_FILE)
+    const varialbesFilePath = path.join(DATA_DIR, dir, VARIABLES_FILE)
+    const config = JSON.parse(fs.readFileSync(externalFilePath))
+    const variables = JSON.parse(fs.readFileSync(varialbesFilePath))
+    const dataDir = path.join(DATA_DIR, dir, 'files', 'ext')
+    processFile(dataDir, config, variables)
+  })
 }
 
 main('external-files', externalFiles)

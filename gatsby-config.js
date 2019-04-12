@@ -1,5 +1,5 @@
 const queries = require(`./utils/algolia-queries`)
-const markdownVars = require(`./content/variables.json`)
+const markdownVars = require(`./content/documentation/variables.json`)
 
 module.exports = {
   siteMetadata: {
@@ -60,9 +60,9 @@ module.exports = {
     {
       resolve: `gatsby-source-filesystem`,
       options: {
-        name: `mdold`,
-        path: `${__dirname}/content/documentation/`,
-        ignore: [`**/.*`],
+        name: `md`,
+        path: `${__dirname}/data`,
+        ignore: [`**/.*`, `**/files`],
       },
     },
     {

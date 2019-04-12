@@ -1,6 +1,10 @@
 import { fail, main } from './utils'
 
-main('load-repos', () => fail('work in progress'))
+const loadRepos = async () => {
+  fail('work in progress')
+}
+
+main('load-repos', loadRepos)
 
 // TODO:
 // load_data() {

@@ -23,6 +23,7 @@ exports.createPages = ({ graphql, actions }) => {
                 id
                 fields {
                   path
+                  version
                 }
               }
             }
@@ -60,17 +61,16 @@ exports.onCreateNode = async ({ node, getNode, actions }) => {
   if (get(node, 'internal.type') === `MarkdownRemark`) {
     const frontmatterPath = get(node, 'frontmatter.path')
     const slug = createFilePath({ node, getNode, basePath: `pages` })
-    const relativePath = path.relative(
-      path.join(__dirname, 'content'),
-      node.fileAbsolutePath
-    )
-    if (startsWith(relativePath, 'documentation/')) {
+    const relativePath = path.relative(__dirname, node.fileAbsolutePath)
+    const version = relativePath.split('/')[1]
+
+    if (startsWith(relativePath, 'data/')) {
       const category = frontmatterPath
         .split('/')
         .slice(0, 1)
         .join('')
       const isRoot = frontmatterPath.split('/').length === 2
-      const url = `/documentation/${frontmatterPath}`
+      const url = `/documentation/${version}/${frontmatterPath}`
       createNodeField({
         node,
         name: `hash`,
@@ -80,6 +80,11 @@ exports.onCreateNode = async ({ node, getNode, actions }) => {
         node,
         name: `category`,
         value: category,
+      })
+      createNodeField({
+        node,
+        name: `version`,
+        value: version,
       })
       createNodeField({
         node,
