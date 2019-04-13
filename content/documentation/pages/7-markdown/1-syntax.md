@@ -205,8 +205,8 @@ After building, the files are located at `/content/files/ext/`
 
 Usage:
 
-`embed:../../files/ext/a/a.java`
-`embed:../../files/ext/b/b.java`
+`embed:../../files/ext/foo/DataFlowServerApplication.java`
+`embed:../../files/ext/foo/LocalDataFlowServerAutoConfiguration.java`
 
 ### Youtube video
 
