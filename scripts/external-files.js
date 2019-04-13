@@ -3,23 +3,11 @@ import fs from 'fs'
 import path from 'path'
 
 import transformer from './../plugins/spring-remark-variables/transformer'
-import { execaOptions, info, main } from './utils'
+import { cleanDir, createDir, execaOptions, info, main } from './utils'
 
 const DATA_DIR = path.join(__dirname, '../data')
 const EXTERNAL_FILE = 'external-files.json'
 const VARIABLES_FILE = 'variables.json'
-
-const cleanExternalFilesDir = dir => {
-  // log('Cleaning', EXTERNAL_FILES_DIR)
-  const { failed } = execa.sync('rm', ['-rf', dir], execaOptions)
-  if (failed) throw new Error(`Couldn't clean ${dir}`)
-}
-
-const createDir = dir => {
-  // log('Creating', dir)
-  const { failed } = execa.sync('mkdir', ['-p', dir], execaOptions)
-  if (failed) throw new Error(`Couldn't create ${dir}`)
-}
 
 const downloadFile = (url, dest) => {
   // log('Downloading', url, 'to', dest)
@@ -28,7 +16,7 @@ const downloadFile = (url, dest) => {
 }
 
 const processFile = (dir, config, variables = {}) => {
-  cleanExternalFilesDir(dir)
+  cleanDir(dir)
   createDir(dir)
   for (let { file, url } of config) {
     info('Loading', file)

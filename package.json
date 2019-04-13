@@ -19,16 +19,17 @@
   },
   "scripts": {
     "clean": "rimraf .cache",
-    "prestart": "yarn run clean && yarn run external-files",
+    "prestart": "yarn run clean && yarn run load-repos && yarn run link-master && yarn run external-files",
     "start": "gatsby develop",
-    "prebuild": "yarn run clean && yarn run lint && yarn run external-files && yarn run test",
+    "prebuild": "yarn run clean && yarn run lint && yarn run load-repos && yarn run link-master && yarn run external-files && yarn run test",
     "build": "gatsby build",
     "serve": "gatsby serve",
     "fix": "NODE_ENV=test import-sort --write '(src|utils|plugins)/**/*.js' && eslint . --fix && prettier --write '**/*.{{c,le,sc}ss,g?(raph)ql,htm?(l),js?(on|on5|onl|x|s),md?(x|wn),m?(ark)down,mkdn,ts?(x),vue,y?(a)ml}'",
     "lint": "NODE_ENV=test import-sort -l '(src|utils|plugins)/**/*.js' && eslint . && prettier --check '**/*.{{c,le,sc}ss,g?(raph)ql,htm?(l),js?(on|on5|onl|x|s),md?(x|wn),m?(ark)down,mkdn,ts?(x),vue,y?(a)ml}'",
     "test": "echo TODO",
     "external-files": "babel-node --no-babelrc --presets @babel/env ./scripts/external-files.js",
-    "load-repos": "babel-node --no-babelrc --presets @babel/env ./scripts/load-repos.js"
+    "load-repos": "babel-node --no-babelrc --presets @babel/env ./scripts/load-repos.js",
+    "link-master": "babel-node --no-babelrc --presets @babel/env ./scripts/link-master.js"
   },
   "browserslist": [
     ">0.25%",
